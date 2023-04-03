@@ -1,11 +1,10 @@
-name: Auto Build KernelSU For MI8SE(sirius)
+name: Build KernelSU For MI8SE(sirius)
 
 on:
-  schedule:
-    - cron: '0 17 * * *'
+  workflow_dispatch:
 
 jobs:
-  AutoKSUForSirius:
+  KSUForSirius:
     runs-on: ubuntu-latest
     steps:
       - name: Installing Dependencies
@@ -13,7 +12,6 @@ jobs:
           sudo apt update -y
           sudo apt-get install -y zip flex bison libncurses-dev gawk  libiberty-dev autoconf kmod bc build-essential gcc libc6 curl libstdc++6 git wget libssl-dev cpio p7zip-full
           sudo apt clean
-          echo "BUILD_TIME=$(TZ=Asia/Shanghai date +%F)" >> $GITHUB_ENV
       - name: Cloning Sources and Toolchain
         run: |
           git clone https://github.com/SakuraNotStupid/android_kernel_xiaomi_sdm710 --depth=1 -b lineage-20_KSU --recurse-submodules
@@ -54,8 +52,8 @@ jobs:
         run: |
           echo "Device: MI 8 SE
           Code: Sirius/Xmsirius
-          Build Time: ${{ env.BUILD_TIME }}
-          CI Auto Build Without Any Test!!
+          Build Code: ${{ github.run_number }}
+          Only For Android 13 based on LineageOS source code(eg. Crdroid)
           KernelSU For MI8SE" >> INFO.txt
           
       - name: Packaging the Kernel
@@ -63,13 +61,13 @@ jobs:
           cp -v android_kernel_xiaomi_sdm710/out/arch/arm64/boot/Image.gz \
                      AnyKernel3/
           pushd AnyKernel3
-          7z a -mx9 ../MI8SE_KernelSU_CI-${{ env.BUILD_TIME }}.zip *
+          7z a -mx9 ../MI8SE_KernelSU.zip *
           popd
       - name: Uploading Kernel Package to GH-Release
         uses: ncipollo/release-action@v1.8.6
         with:
-          artifacts: MI8SE_KernelSU_CI-${{ env.BUILD_TIME }}.zip
-          name: "MI8SE_KernelSU_CI-${{ env.BUILD_TIME }}"
-          tag: " ${{ env.BUILD_TIME }}_MI8SE_KernelSU_CI"
+          artifacts: MI8SE_KernelSU.zip
+          name: "MI8SE_KernelSU"
+          tag: " ${{ github.run_number }}_MI8SE_KernelSU"
           bodyFile: "INFO.txt"
           token: ${{ secrets.GITHUB_TOKEN }}
