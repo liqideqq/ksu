@@ -10,20 +10,23 @@ jobs:
       - name: Installing Dependencies
         run: |
           sudo apt update -y
-          sudo apt-get install -y zip flex bison libncurses-dev gawk  libiberty-dev autoconf kmod bc build-essential gcc libc6 curl libstdc++6 git wget libssl-dev cpio p7zip-full
+          sudo apt-get install -y zip flex bison libncurses-dev gawk libiberty-dev autoconf kmod bc build-essential gcc libc6 curl libstdc++6 git wget libssl-dev cpio p7zip-full
           sudo apt clean
+
       - name: Cloning Sources and Toolchain
         run: |
-          git clone https://github.com/SakuraNotStupid/android_kernel_xiaomi_sdm710 --depth=1 -b lineage-20_KSU --recurse-submodules
-          git clone https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r445002 --depth=1 --single-branch --no-tags -b 12.0 ~/clang
-          git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android-10.0.0_r47 --depth=1 --single-branch --no-tags ~/aarch64-linux-android-4.9
-          git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-10.0.0_r47 --depth=1 --single-branch --no-tags ~/arm-linux-androideabi-4.9
+          git clone --depth=1 -b lineage-20_KSU --recurse-submodules https://github.com/SakuraNotStupid/android_kernel_xiaomi_sdm710
+          git clone --depth=1 --single-branch --no-tags -b 12.0 https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r445002 ~/clang
+          git clone --depth=1 --single-branch --no-tags -b android-10.0.0_r47 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 ~/aarch64-linux-android-4.9
+          git clone --depth=1 --single-branch --no-tags -b android-10.0.0_r47 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 ~/arm-linux-androideabi-4.9
           git clone https://github.com/SakuraNotStupid/AnyKernel3
+
       - name: Applying Kernel Patch
         run: |
-           cd android_kernel_xiaomi_sdm710/KernelSU
-           wget https://github.com/tiann/KernelSU/commit/0950fbba5e79820da539054f6eb6d1d48ec96ff4.patch
-           patch -p1 < 0950fbba5e79820da539054f6eb6d1d48ec96ff4.patch
+          cd android_kernel_xiaomi_sdm710/KernelSU
+          wget https://github.com/tiann/KernelSU/commit/0950fbba5e79820da539054f6eb6d1d48ec96ff4.patch
+          patch -p1 < 0950fbba5e79820da539054f6eb6d1d48ec96ff4.patch
+
       - name: Compiling Kernel
         run: |
           CLANG=~/clang/bin
@@ -38,13 +41,14 @@ jobs:
           output_dir=out
           pushd android_kernel_xiaomi_sdm710
           make O="$output_dir" \
-                      sdm670-perf_defconfig \
-                      xiaomi/sdm710-common.config \
-                      xiaomi/sirius.config
+            sdm670-perf_defconfig \
+            xiaomi/sdm710-common.config \
+            xiaomi/sirius.config
           make -j $(nproc) \
-                       O="$output_dir" \
-                       CC=clang
+            O="$output_dir" \
+            CC=clang
           popd
+
       - name: Creating Config Info
         run: |
           echo "Device: MI 8 SE
@@ -52,14 +56,14 @@ jobs:
           Build Code: ${{ github.run_number }}
           Only For Android 13 based on LineageOS source code(eg. Crdroid)
           KernelSU For MI8SE" >> INFO.txt
-          
+
       - name: Packaging the Kernel
         run: |
-          cp -v android_kernel_xiaomi_sdm710/out/arch/arm64/boot/Image.gz \
-                     AnyKernel3/
+          cp -v android_kernel_xiaomi_sdm710/out/arch/arm64/boot/Image.gz AnyKernel3/
           pushd AnyKernel3
           7z a -mx9 ../MI8SE_KernelSU.zip *
           popd
+
       - name: Uploading Kernel Package to GH-Release
         uses: ncipollo/release-action@v1.8.6
         with:
