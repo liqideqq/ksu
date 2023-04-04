@@ -28,6 +28,7 @@ jobs:
           cd android_kernel_xiaomi_sdm710_LineageOS/KernelSU
           wget https://github.com/tiann/KernelSU/commit/0950fbba5e79820da539054f6eb6d1d48ec96ff4.patch
           patch -p1 < 0950fbba5e79820da539054f6eb6d1d48ec96ff4.patch
+          rm -rf *.patch
 
       - name: Compile Kernel(LineageOS)
         run: |
