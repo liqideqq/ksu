@@ -1,34 +1,33 @@
 name: Build KernelSU For MI8SE(sirius)
 
-on:
-  workflow_dispatch:
+on: workflow_dispatch
 
 jobs:
   KSUForSirius:
     runs-on: ubuntu-latest
     steps:
-      - name: Install Dependencies
+      - name: Installing Dependencies
         run: |
           sudo apt update -y
-          sudo apt install -y zip flex bison libncurses-dev gawk libiberty-dev autoconf kmod bc build-essential gcc libc6 curl libstdc++6 git wget libssl-dev cpio p7zip-full
+          sudo apt-get install -y zip flex bison libncurses-dev gawk libiberty-dev autoconf kmod bc build-essential gcc libc6 curl libstdc++6 git wget libssl-dev cpio p7zip-full
           sudo apt clean
-
-      - name: Clone Sources and Toolchain
+          
+      - name: Cloning Sources and Toolchain
         run: |
-          git clone --depth=1 -b lineage-20_KSU --recurse-submodules https://github.com/SakuraNotStupid/android_kernel_xiaomi_sdm710
+          git clone --depth=1 -b lineage-20 --recurse-submodules https://github.com/liqidecg/kernel_xiaomi_sdm710_ksu android_kernel_xiaomi_sdm710_LineageOS
           git clone --depth=1 --single-branch --no-tags -b 12.0 https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r445002 ~/clang
           git clone --depth=1 --single-branch --no-tags -b android-10.0.0_r47 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 ~/aarch64-linux-android-4.9
           git clone --depth=1 --single-branch --no-tags -b android-10.0.0_r47 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 ~/arm-linux-androideabi-4.9
           git clone https://github.com/SakuraNotStupid/AnyKernel3
-
-      - name: Apply Kernel Patch
+          
+      - name: Applying Kernel Patch(LineageOS)
         run: |
-          cd android_kernel_xiaomi_sdm710/KernelSU
+          cd android_kernel_xiaomi_sdm710_LineageOS/KernelSU
           wget https://github.com/tiann/KernelSU/commit/0950fbba5e79820da539054f6eb6d1d48ec96ff4.patch
           patch -p1 < 0950fbba5e79820da539054f6eb6d1d48ec96ff4.patch
-          rm -rf *.patch
+          rm -f *.patch
           
-      - name: Compile Kernel
+      - name: Compiling Kernel(LineageOS)
         run: |
           CLANG=~/clang/bin
           GCC32=~/arm-linux-androideabi-4.9/bin
@@ -40,36 +39,27 @@ jobs:
           export CROSS_COMPILE=aarch64-linux-android-
           export CROSS_COMPILE_ARM32=arm-linux-androideabi-
           output_dir=out
-          pushd android_kernel_xiaomi_sdm710
-          make O="$output_dir" \
-            sdm670-perf_defconfig \
-            xiaomi/sdm710-common.config \
-            xiaomi/sirius.config
-          make -j $(nproc) \
-            O="$output_dir" \
-            CC=clang
+          pushd android_kernel_xiaomi_sdm710_LineageOS
+          make O="$output_dir" sdm670-perf_defconfig xiaomi/sdm710-common.config xiaomi/sirius.config
+          make -j "$(nproc)" O="$output_dir" CC=clang
           popd
-
-      - name: Create Config Info
+          
+      - name: Packaging the Kernel(LineageOS)
         run: |
-          echo "Device: MI 8 SE
-          Code: Sirius/Xmsirius
-          Build Code: ${{ github.run_number }}
-          Only For Android 13 based on LineageOS source code(eg. Crdroid)
-          KernelSU For MI8SE" >> INFO.txt
-
-      - name: Package Kernel
-        run: |
-          cp -v android_kernel_xiaomi_sdm710/out/arch/arm64/boot/Image.gz AnyKernel3/
+          cp -v android_kernel_xiaomi_sdm710_LineageOS/out/arch/arm64/boot/Image.gz AnyKernel3/
           pushd AnyKernel3
-          7z a -mx9 ../MI8SE_KernelSU.zip *
+          7z a -mx9 ../MI8SE_KernelSU_LineageOS.zip *
           popd
-
-      - name: Upload Kernel Package to GH-Release
+          
+      - name: Creating Config Info
+        run: |
+          echo -e "Device: MI 8 SE\nCode: Sirius/Xmsirius\nBuild Code: ${{ github.run_number }}\nKernelSU For MI8SE" > INFO.txt
+          
+      - name: Uploading Kernel Package to GH-Release
         uses: ncipollo/release-action@v1.8.6
         with:
-          artifacts: MI8SE_KernelSU.zip
-          name: "MI8SE_KernelSU"
-          tag: " ${{ github.run_number }}_MI8SE_KernelSU"
-          bodyFile: "INFO.txt"
-          token: ${{ secrets.GITHUB_TOKEN }} 
+          artifacts: MI8SE_KernelSU_LineageOS.zip
+          name: MI8SE_KernelSU
+          tag: "${{ github.run_number }}_MI8SE_KernelSU"
+          bodyFile: INFO.txt
+          token: ${{ secrets.GITHUB_TOKEN }}
