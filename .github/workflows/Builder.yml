@@ -22,11 +22,11 @@ jobs:
           
       - name: Applying Kernel Patch(LineageOS)
         run: |
-          cd android_kernel_xiaomi_sdm710_LineageOS/KernelSU
-          wget https://github.com/tiann/KernelSU/commit/0950fbba5e79820da539054f6eb6d1d48ec96ff4.patch
-          patch -p1 < 0950fbba5e79820da539054f6eb6d1d48ec96ff4.patch
-          rm -f *.patch
-          
+           cd android_kernel_xiaomi_sdm710_LineageOS/KernelSU
+           wget https://github.com/tiann/KernelSU/commit/0950fbba5e79820da539054f6eb6d1d48ec96ff4.patch
+           patch -p1 < 0950fbba5e79820da539054f6eb6d1d48ec96ff4.patch
+           rm -rf *.patch
+           
       - name: Compiling Kernel(LineageOS)
         run: |
           CLANG=~/clang/bin
@@ -40,26 +40,34 @@ jobs:
           export CROSS_COMPILE_ARM32=arm-linux-androideabi-
           output_dir=out
           pushd android_kernel_xiaomi_sdm710_LineageOS
-          make O="$output_dir" sdm670-perf_defconfig xiaomi/sdm710-common.config xiaomi/sirius.config
-          make -j "$(nproc)" O="$output_dir" CC=clang
+          make O="$output_dir" \
+                      sdm670-perf_defconfig \
+                      xiaomi/sdm710-common.config \
+                      xiaomi/sirius.config
+          make -j $(nproc) \
+                       O="$output_dir" \
+                       CC=clang
           popd
           
       - name: Packaging the Kernel(LineageOS)
         run: |
-          cp -v android_kernel_xiaomi_sdm710_LineageOS/out/arch/arm64/boot/Image.gz AnyKernel3/
+          cp -v android_kernel_xiaomi_sdm710_LineageOS/out/arch/arm64/boot/Image.gz \
+                     AnyKernel3/
           pushd AnyKernel3
           7z a -mx9 ../MI8SE_KernelSU_LineageOS.zip *
           popd
           
       - name: Creating Config Info
         run: |
-          echo -e "Device: MI 8 SE\nCode: Sirius/Xmsirius\nBuild Code: ${{ github.run_number }}\nKernelSU For MI8SE" > INFO.txt
-          
+          echo "Device: MI 8 SE
+          Code: Sirius/Xmsirius
+          Build Code: ${{ github.run_number }}
+          KernelSU For MI8SE" >> INFO.txt
       - name: Uploading Kernel Package to GH-Release
         uses: ncipollo/release-action@v1.8.6
         with:
           artifacts: MI8SE_KernelSU_LineageOS.zip
-          name: MI8SE_KernelSU
-          tag: "${{ github.run_number }}_MI8SE_KernelSU"
-          bodyFile: INFO.txt
+          name: "MI8SE_KernelSU"
+          tag: " ${{ github.run_number }}_MI8SE_KernelSU"
+          bodyFile: "INFO.txt"
           token: ${{ secrets.GITHUB_TOKEN }}
