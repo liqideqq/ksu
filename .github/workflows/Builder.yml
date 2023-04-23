@@ -21,12 +21,10 @@ jobs:
           git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-10.0.0_r47 --depth=1 --single-branch --no-tags ~/arm-linux-androideabi-4.9
           git clone https://github.com/SakuraNotStupid/AnyKernel3
           
-      - name: Applying Kernel Patch(LineageOS)
+      - name: Applying KernelSU(LineageOS)
         run: |
-           cd android_kernel_xiaomi_sdm710_LineageOS/KernelSU
-           wget https://github.com/tiann/KernelSU/commit/ca619031cc0e50fabac47945ed81624bba4507d2.patch
-           patch -p1 < ca619031cc0e50fabac47945ed81624bba4507d2.patch
-           rm -rf *.patch
+           cd android_kernel_xiaomi_sdm710_LineageOS
+           curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
            
       - name: Compiling Kernel(LineageOS)
         run: |
