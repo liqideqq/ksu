@@ -32,8 +32,6 @@ jobs:
           pushd android_kernel_xiaomi_sdm710_LineageOS
           make O="$output_dir" \
                       sdm670-perf_defconfig \
-                      xiaomi/sdm710-common.config \
-                      xiaomi/sirius.config
           make -j $(nproc) \
                        O="$output_dir" \
                        CC=clang
