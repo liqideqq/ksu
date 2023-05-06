@@ -16,10 +16,7 @@ jobs:
       - name: Cloning Sources and Toolchain
         run: |
           git clone https://github.com/liqideqq/Xiaomi_Kernel_Sirius --depth=1 -b main --recurse-submodules android_kernel_xiaomi_sdm710_LineageOS
-          git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android-10.0.0_r47 --depth=1 --single-branch --no-tags ~/aarch64-linux-android-4.9
-          git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-10.0.0_r47 --depth=1 --single-branch --no-tags ~/arm-linux-androideabi-4.9
-          git clone https://github.com/SakuraNotStupid/AnyKernel3
-           
+ 
       - name: Compiling Kernel(LineageOS)
         run: |
           CLANG=~/clang/bin
