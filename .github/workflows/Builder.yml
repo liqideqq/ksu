@@ -27,7 +27,7 @@ jobs:
            patch -p1 < e1fe19427555da9b01b5550a5ba5bccfcbd0d885.patch
            
            wget https://github.com/dibin666/android_kernel_sony_msm8956/commit/d3cf5399865a8c11791b3c0a33a964ee4737c9b7.patch
-           patch -p1 < d3cf5399865a8c11791b3c0a33a964ee4737c9b7.patc
+           patch -p1 < d3cf5399865a8c11791b3c0a33a964ee4737c9b7.patch
            
            rm -rf *.patch
       - name: Compiling Kernel(LineageOS)
