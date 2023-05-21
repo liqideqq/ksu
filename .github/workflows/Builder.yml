@@ -12,15 +12,24 @@ jobs:
           sudo apt update -y
           sudo apt-get install -y zip flex bison libncurses-dev gawk  libiberty-dev autoconf kmod bc build-essential gcc libc6 curl libstdc++6 git wget libssl-dev cpio p7zip-full
           sudo apt clean
-          
       - name: Cloning Sources and Toolchain
         run: |
-          git clone https://github.com/liqidecg/android_kernel_xiaomi_sdm710 --depth=1 -b lineage-20 --recurse-submodules android_kernel_xiaomi_sdm710_LineageOS
+          git clone https://github.com/liqidecg/android_kernel_xiaomi_sdm710 --depth=1 -b lineage-20_KSU --recurse-submodules android_kernel_xiaomi_sdm710_LineageOS
           git clone https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r445002 --depth=1 --single-branch --no-tags -b 12.0 ~/clang
           git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android-10.0.0_r47 --depth=1 --single-branch --no-tags ~/aarch64-linux-android-4.9
           git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-10.0.0_r47 --depth=1 --single-branch --no-tags ~/arm-linux-androideabi-4.9
           git clone https://github.com/SakuraNotStupid/AnyKernel3
+      - name: Applying Kernel Patch(LineageOS)
+        run: |
+           cd android_kernel_xiaomi_sdm710_LineageOS/KernelSU
            
+           wget https://github.com/SakuraNotStupid/KernelSU/commit/e1fe19427555da9b01b5550a5ba5bccfcbd0d885.patch
+           patch -p1 < e1fe19427555da9b01b5550a5ba5bccfcbd0d885.patch
+           
+           wget https://github.com/dibin666/android_kernel_sony_msm8956/commit/d3cf5399865a8c11791b3c0a33a964ee4737c9b7.patch
+           patch -p1 < d3cf5399865a8c11791b3c0a33a964ee4737c9b7.patc
+           
+           rm -rf *.patch
       - name: Compiling Kernel(LineageOS)
         run: |
           CLANG=~/clang/bin
@@ -42,7 +51,6 @@ jobs:
                        O="$output_dir" \
                        CC=clang
           popd
-          
       - name: Packaging the Kernel(LineageOS)
         run: |
           cp -v android_kernel_xiaomi_sdm710_LineageOS/out/arch/arm64/boot/Image.gz \
@@ -50,14 +58,12 @@ jobs:
           pushd AnyKernel3
           7z a -mx9 ../MI8SE_KernelSU_LineageOS.zip *
           popd
-          
       - name: Creating Config Info
         run: |
           echo "Device: MI 8 SE
           Code: Sirius/Xmsirius
           Build Code: ${{ github.run_number }}
           KernelSU For MI8SE" >> INFO.txt
-          
       - name: Uploading Kernel Package to GH-Release
         uses: ncipollo/release-action@v1.8.6
         with:
