@@ -24,8 +24,8 @@ jobs:
       - name: Applying Kernel Patch(LineageOS)
         run: |
            cd android_kernel_xiaomi_sdm710_LineageOS/KernelSU
-           wget https://github.com/tiann/KernelSU/commit/128f0aa87371ddc05331cf9e13c74bba6887449e.patch
-           patch -p1 < 128f0aa87371ddc05331cf9e13c74bba6887449e.patch
+           wget https://github.com/SakuraNotStupid/KernelSU/commit/7e8e62c7834237633f03b2abd1fa44dc6347d356.patch
+           patch -p1 < 7e8e62c7834237633f03b2abd1fa44dc6347d356.patch
            rm -rf *.patch
       - name: Compiling Kernel(LineageOS)
         run: |
