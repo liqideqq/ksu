@@ -15,7 +15,7 @@ jobs:
 
       - name: Clone Sources and Toolchain
         run: |
-          git clone https://github.com/liqideqq/sirius_Kernel --depth=1 -b sirius-q-oss --recurse-submodules sirius_Kernel
+          git clone https://github.com/A-JiuA/sirius_Kernel --depth=1 -b sirius-q-oss --recurse-submodules sirius_Kernel
           git clone https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b --depth=1 --single-branch --no-tags -b lineage-20.0 ~/clang
           git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android-10.0.0_r47 --depth=1 --single-branch --no-tags ~/aarch64-linux-android-4.9
           git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-10.0.0_r47 --depth=1 --single-branch --no-tags ~/arm-linux-androideabi-4.9
