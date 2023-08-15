@@ -27,7 +27,7 @@ jobs:
            rm -rf *.patch
       - name: Compiling Kernel(MIUI)
         run: |
-          CLANG=~/clang/bin
+          CLANG=~/android_prebuilts_clang_kernel_linux-x86_clang-r416183b/bin
           GCC32=~/arm-linux-androideabi-4.9/bin
           GCC64=~/aarch64-linux-android-4.9/bin
           PATH=$CLANG:$GCC64:$GCC32:$PATH
