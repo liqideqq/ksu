@@ -35,6 +35,7 @@ jobs:
           output_dir=out
           pushd sirius_Kernel_MIUI
           make O="$output_dir" \
+                      sdm670-perf_defconfig \
                       xiaomi/sdm710-common.config \
                       xiaomi/sirius.config
           make -j $(nproc) \
