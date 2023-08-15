@@ -28,14 +28,10 @@ jobs:
       - name: Compiling Kernel(MIUI)
         run: |
           CLANG=~/android_prebuilts_clang_kernel_linux-x86_clang-r416183b/bin
-          GCC32=~/arm-linux-androideabi-4.9/bin
           GCC64=~/aarch64-linux-android-4.9/bin
-          PATH=$CLANG:$GCC64:$GCC32:$PATH
-          export PATH
-          export ARCH=arm64
-          export CLANG_TRIPLE=aarch64-linux-gnu
-          export CROSS_COMPILE=aarch64-linux-android-
-          export CROSS_COMPILE_ARM32=arm-linux-androideabi-
+          GCC32=~/arm-linux-androideabi-4.9/bin
+          export PATH=$CLANG:$GCC64:$GCC32:$PATH
+          export args="-j$(nproc --all) ARCH=arm64 SUBARCH=arm64 O=~/out CC=clang CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi- CLANG_TRIPLE=aarch64-linux-gnu- LLVM=1"
           output_dir=out
           pushd sirius_Kernel_MIUI
           make O="$output_dir" \
