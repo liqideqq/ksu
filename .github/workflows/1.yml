@@ -1,0 +1,53 @@
+name: Build Kernel
+
+on:
+  push:
+    branches:
+      - main  # Change this to the branch you want to trigger the workflow on
+
+jobs:
+  build:
+    name: Build Kernel
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: '11'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python
+        # Add any other dependencies here
+
+    - name: Clone prebuilt toolchains
+      run: |
+        git clone https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b ~/android_prebuilts_clang_kernel_linux-x86_clang-r416183b --depth=1
+        git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android-10.0.0_r47 ~/aarch64-linux-android-4.9 --depth=1
+        git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-10.0.0_r47 ~/arm-linux-androideabi-4.9 --depth=1
+
+    - name: Clone kernel source
+      run: |
+        git clone https://github.com/Guozhiye/sirius_Kernel.git ~/sirius_Kernel --depth=1
+
+    - name: Set up environment
+      run: |
+        CLANG=~/android_prebuilts_clang_kernel_linux-x86_clang-r416183b/bin
+        GCC64=~/aarch64-linux-android-4.9/bin
+        GCC32=~/arm-linux-androideabi-4.9/bin
+        export PATH=$CLANG:$GCC64:$GCC32:$PATH
+        export args="-j$(nproc --all) ARCH=arm64 SUBARCH=arm64 O=~/out CC=clang CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi- CLANG_TRIPLE=aarch64-linux-gnu- LLVM=1"
+
+    - name: Compile kernel
+      run: |
+        cd ~/sirius_Kernel
+        make ${args} sirius_zhong_defconfig
+        make ${args}
+
+    # Add more steps as needed (e.g., testing, packaging, etc.)
