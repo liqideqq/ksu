@@ -15,18 +15,11 @@ jobs:
 
       - name: Clone Sources and Toolchain
         run: |
-          git clone https://github.com/liqideqq/sirius_Kernel --depth=1 -b sirius-q-oss --recurse-submodules sirius_Kernel
+          git clone https://github.com/A-JiuA/sirius_Kernel --depth=1 -b sirius-q-oss --recurse-submodules sirius_Kernel
           git clone https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b --depth=1 --single-branch --no-tags -b lineage-20.0 ~/clang
           git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android-10.0.0_r47 --depth=1 --single-branch --no-tags ~/aarch64-linux-android-4.9
           git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-10.0.0_r47 --depth=1 --single-branch --no-tags ~/arm-linux-androideabi-4.9
           git clone https://github.com/SakuraNotStupid/AnyKernel3
-
-      - name: Apply Kernel Patch (MIUI)
-        run: |
-          cd sirius_Kernel/KernelSU
-          wget https://github.com/liqideqq/KernelSU/commit/eeb2b07d5178a741341dce79eb68cd2052488cb3.patch
-          patch -p1 < eeb2b07d5178a741341dce79eb68cd2052488cb3.patch
-          rm -rf *.patch
 
       - name: Compile Kernel (MIUI)
         run: |
@@ -34,16 +27,11 @@ jobs:
           GCC32=~/arm-linux-androideabi-4.9/bin
           GCC64=~/aarch64-linux-android-4.9/bin
           export PATH=$CLANG:$GCC64:$GCC32:$PATH
-          export args="-j$(nproc --all) ARCH=arm64 SUBARCH=arm64 O=~/out CC=clang CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi- CLANG_TRIPLE=aarch64-linux-gnu- LLVM=1"
           output_dir=out
+          export args="-j$(nproc --all) ARCH=arm64 SUBARCH=arm64 O=$output_dir CC=clang CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi- CLANG_TRIPLE=aarch64-linux-gnu- LLVM=1"
           pushd sirius_Kernel
-          make O="$output_dir" \
-            sdm670-perf_defconfig \
-            xiaomi/sdm710-common.config \
-            xiaomi/sirius.config
-          make -j $(nproc) \
-            O="$output_dir" \
-            CC=clang
+          make ${args} sirius_zhong_defconfig
+          make ${args}
           popd
 
       - name: Package the Kernel (MIUI)
