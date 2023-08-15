@@ -36,7 +36,7 @@ jobs:
           export PATH=$CLANG:$GCC64:$GCC32:$PATH
           export args="-j$(nproc --all) ARCH=arm64 SUBARCH=arm64 O=~/out CC=clang CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi- CLANG_TRIPLE=aarch64-linux-gnu- LLVM=1"
           output_dir=out
-          pushd android_kernel_xiaomi_sdm710_LineageOS
+          pushd sirius_Kernel
           make O="$output_dir" \
             sdm670-perf_defconfig \
             xiaomi/sdm710-common.config \
