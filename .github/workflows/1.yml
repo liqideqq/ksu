@@ -30,17 +30,15 @@ jobs:
 
       - name: Compile Kernel (MIUI)
         run: |
-          CLANG=~/clang/bin
-          GCC64=~/aarch64-linux-android-4.9/bin
-          GCC32=~/arm-linux-androideabi-4.9/bin
-          export PATH=$CLANG:$GCC64:$GCC32:$PATH
-          export args="-j$(nproc --all) ARCH=arm64 SUBARCH=arm64 O=~/out CC=clang CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi- CLANG_TRIPLE=aarch64-linux-gnu- LLVM=1"
-          # Add this line to disable -fstack-protector-strong
-          export args="$args STACKPROTECTOR=off"
-          cd sirius_Kernel
-          make ${args} sirius_zhong_defconfig
-          make ${args}
-
+    CLANG=~/clang/bin
+    GCC64=~/aarch64-linux-android-4.9/bin
+    GCC32=~/arm-linux-androideabi-4.9/bin
+    export PATH=$CLANG:$GCC64:$GCC32:$PATH
+    export args="-j$(nproc --all) ARCH=arm64 SUBARCH=arm64 O=~/out CC=clang CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi- CLANG_TRIPLE=aarch64-linux-gnu- LLVM=1 STACKPROTECTOR=off"  # 注意这一行的修改
+    cd sirius_Kernel
+    make ${args} sirius_zhong_defconfig
+    make ${args}
+    
       - name: Package the Kernel (MIUI)
         run: |
           cp -v sirius_Kernel/out/arch/arm64/boot/Image.gz AnyKernel3/
