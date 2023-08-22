@@ -30,7 +30,7 @@ jobs:
           output_dir=out
           export args="-j$(nproc --all) ARCH=arm64 SUBARCH=arm64 O=$output_dir CC=clang CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi- CLANG_TRIPLE=aarch64-linux-gnu- LLVM=1"
           pushd sirius_Kernel
-          make ${args} sirius_zhong_defconfig
+          make ${args} sirius_defconfig
           make ${args}
           popd
 
