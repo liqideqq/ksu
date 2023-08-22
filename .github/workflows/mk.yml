@@ -1,4 +1,4 @@
-name: Build KernelSU For MI8SE (sirius)
+name: KernelSU For MI8SE (sirius)
 
 on:
   workflow_dispatch:
