@@ -1,4 +1,4 @@
-name: KernelSU For MI8SE (sirius)
+name: KernelSU For MI8SE
 
 on:
   workflow_dispatch:
@@ -15,13 +15,13 @@ jobs:
 
       - name: Clone Sources and Toolchain
         run: |
-          git clone https://github.com/liqideqq/kernel_xiaomi_sdm710 --depth=1 -b lineage-17.1 --recurse-submodules sirius_Kernel
+          git clone https://github.com/liqideqq/sirius_Kernel --depth=1 -b sirius-q-oss --recurse-submodules sirius_Kernel
           git clone https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b --depth=1 --single-branch --no-tags -b lineage-20.0 ~/clang
           git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android-10.0.0_r47 --depth=1 --single-branch --no-tags ~/aarch64-linux-android-4.9
           git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-10.0.0_r47 --depth=1 --single-branch --no-tags ~/arm-linux-androideabi-4.9
           git clone https://github.com/SakuraNotStupid/AnyKernel3
 
-      - name: Compile Kernel (MK)
+      - name: Compile Kernel (MIUI)
         run: |
           CLANG=~/clang/bin
           GCC32=~/arm-linux-androideabi-4.9/bin
@@ -30,15 +30,15 @@ jobs:
           output_dir=out
           export args="-j$(nproc --all) ARCH=arm64 SUBARCH=arm64 O=$output_dir CC=clang CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi- CLANG_TRIPLE=aarch64-linux-gnu- LLVM=1"
           pushd sirius_Kernel
-          make ${args} sirius_defconfig
+          make ${args} sirius_zhong_defconfig
           make ${args}
           popd
 
-      - name: Package the Kernel (MK)
+      - name: Package the Kernel (MIUI)
         run: |
           cp -v sirius_Kernel/out/arch/arm64/boot/Image.gz AnyKernel3/
           pushd AnyKernel3
-          7z a -mx9 ../MI8SE_KernelSU_MK.zip *
+          7z a -mx9 ../MI8SE_KernelSU_MIUI.zip *
           popd
 
       - name: Create Config Info
@@ -51,7 +51,7 @@ jobs:
       - name: Upload Kernel Package to GH-Release
         uses: ncipollo/release-action@v1.8.6
         with:
-          artifacts: MI8SE_KernelSU_MK.zip
+          artifacts: MI8SE_KernelSU_MIUI.zip
           name: "MI8SE_KernelSU"
           tag: "${{ github.run_number }}_MI8SE_KernelSU"
           bodyFile: "INFO.txt"
